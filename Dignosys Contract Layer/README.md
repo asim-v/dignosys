@@ -1,5 +1,5 @@
 
-# WALLET SERVICE
+# WALLET SERVICE - LIBRARY USED TO DEPLOY SMART CONTRACTS
 
 Programmatically interface with your Blockchain.info wallet.
 
