@@ -1,5 +1,5 @@
 
-# Blockchain Wallet API V2
+# WALLET SERVICE
 
 Programmatically interface with your Blockchain.info wallet.
 
