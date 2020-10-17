@@ -14,6 +14,7 @@
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/font-awesome.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script>
     var preloader = document.getElementById('preloader')
     // window.onload = () => {
@@ -137,24 +138,63 @@
           </div>
         </div>
         <div class="col-md-9 col-sm-8 col-xs-12">
-          <div style="visibility: visible;" class="col-sm-9 more-features-box">
+          <div style="visibility: visible;" class="col-sm-9 more-features-box" id="panel">
+            {{checkups}}
+            {% for checkup in checkups%}
             <div class="more-features-box-text">
               <div class="row">
-                <div class="col-lg-4">
+                <div class="col-sm-4">
                   <div class="more-features-box-text-icon"> <i class="fa fa-angle-right" aria-hidden="true"></i> </div>
-                  <div class="more-features-box-text-icon">
+                  <div class="more-features-box-text-description">
                     <h3>12345.</h3>
-                    <p>Details</p>
+                    <p>Unfilled</p>
+                    <button onclick="displayDetails()">details</button>
+                    
                   </div>
                 </div>
-                <div class="col-lg-8">
-                  <div class="col-sm-2">
-                    det1
+                <div class="col-sm-7">
+                  <div class="count">
+                    50%;
                   </div>
+                  <div class="count">
+                    50%;
+                  </div>
+                  <div class="count">
+                    50%;
+                  </div>
+                  <div class="count">
+                    50%;
+                  </div>
+                  <div class="count">
+                    50%;
+                  </div>
+                  <div class="count">
+                    50%;
+                  </div>
+
+                </div>
+                <div class="col-sm-1">
+                  <i class="fa fa-copy" style="padding-right: 15px;"></i>
                 </div>
               </div>
-            </div>          
+            </div>              
+            {% endfor%}
+                    
           </div>
+
+            <div class="more-features-box-text">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="more-features-box-text-icon"> <i class="fa fa-plus" aria-hidden="true"></i> </div>
+                  <div class="more-features-box-text-description">
+                    <h3><button onclick="createForm()" class="createform">Create Form</button></h3>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>  
+
         </div>
       </div>
     </div>
@@ -166,14 +206,14 @@
 
   <!--footer-->
   <footer id="footer" style="bottom: 0;
-    position: absolute;
+    position: fixed;
     width: 100%;
 }">
     <div class="footer-line">
       <div class="container">
         <div class="row">
           <div class="col-md-12 text-center">
-            © All Rights Reserved By CARDIO-D20
+            © All Rights Reserved By Dignosys
             <div class="credits">
             </div>
           </div>
@@ -183,6 +223,23 @@
   </footer>
   <!--/ footer-->
   
+  <script type="text/javascript">
+  function createForm() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var response = this.responseText;
+        if (response != ""){
+          document.getElementById("panel").innerHTML += '<div class="more-features-box-text"> <div class="row"> <div class="col-sm-4"> <div class="more-features-box-text-icon"> <i class="fa fa-angle-right" aria-hidden="true"></i> </div> <div class="more-features-box-text-description"> <h3>12345.</h3> <p>Unfilled</p> <button onclick="displayDetails()">details</button> </div> </div> <div class="col-sm-7"> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> </div> <div class="col-sm-1"> <i class="fa fa-copy" style="padding-right: 15px;"></i> </div> </div> </div> ';
+        };
+        console.log(response);
+      }
+    };
+    xhttp.open("GET", "/add", true);
+    xhttp.send();
+  }
+  </script>
+
   <script src="static/js/jquery.min.js"></script>
   <script src="static/js/jquery.easing.min.js"></script>
   <script src="static/js/bootstrap.min.js"></script>

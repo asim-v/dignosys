@@ -60,6 +60,22 @@ hr.botm-line {
 /***************************************
 banner
 ***************************************/
+.count{
+    display: inline-flex;
+    background-color: #ff00002b;
+    color: #ff3b3b;
+    padding: 1%;
+    padding-left: 2%;
+    padding-right: 2%;
+    border-radius: 5px;
+    font-weight: 600;
+}
+.createform{
+    color: #0cb8b6;
+    text-decoration: none;
+    border:none;
+    background:transparent;
+}
 .navbar {
     margin-bottom: 0px;
     border: 0px;
@@ -262,6 +278,7 @@ about
     text-align: center;
 }
 .more-features-box-text-description h3{
+    margin: 0;
     padding-bottom: 15px;
 }
 .more-features-box-text-icon i {
