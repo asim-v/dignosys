@@ -8,7 +8,7 @@
 
 	<div class="container pt-4">
 
-	<form method="POST" action="{{ url_for('process_user_data') }}">
+	<form method="POST" action="" id="form">
 		
 		<input name="age" placeholder="age" value="" type="text" autofocus class="form-control"><br>
 		<input name="sex" placeholder="sex" value="" type="text" autofocus class="form-control"><br>
@@ -36,6 +36,9 @@
 function validate(){
   $("#save_button").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando ...');
 }	
+var url = window.location.pathname.split("/");
+var id = window.location.pathname.split("/")[url.length-1];
+document.getElementById("form").action = "/form/"+id
 </script>
 
 </html>

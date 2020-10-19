@@ -1,4 +1,5 @@
-from flask import Flask, flash, render_template, request, jsonify, Session
+from flask import Flask, flash, render_template, request, jsonify, session
+from bson.objectid import ObjectId
 import pymongo
 import math
 import numpy as np
@@ -128,7 +129,6 @@ def ensemble_model(udata, grid_svm, classifierNB, classifierLR, classifierDT, cl
 
 app = Flask(__name__) # Creates an instance of Flask
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
 app.config['SECRET_KEY'] = 'hello_flask_app' # defines the secret key for the app inorder to use flash messages
 mongo = pymongo.MongoClient() # creates a connection to MongoDB by default no params are required
 
@@ -137,6 +137,56 @@ mongo = pymongo.MongoClient() # creates a connection to MongoDB by default no pa
 @app.route('/') #defines a root route
 def hello_world(): # method to handle at the root route
     return render_template('index.html') #if the server responds (200) status code the it returns the html page to user pyt
+
+@app.route('/db/<id>',methods=['POST','DELETE','GET'])  
+def db(id):    
+
+    
+    def deleteAll():#Deletes all the db
+        db = mongo.heart.users
+
+        try:
+            for x in db.find():db.remove(x['_id'])
+        except Exception as e:   #Just if something goes wrong
+            res = 'Cant remove all: '+str(e)
+        return jsonify('OK') #As proff that there's nothing ;)
+
+    def getAll():
+        #Gets everything in the database
+        return jsonify([str(x) for x in mongo.heart.users.find()])
+
+    def getUser(id):
+        #Fetches specific user id
+        db = mongo.heart.users
+        return jsonify(str(db.find(id)))
+
+    def removeUser(id):
+        db = mongo.heart.users
+        return jsonify(str(db.remove(id)))
+
+    def addUser(user_obj):
+        db = mongo.heart.users
+        return jsonify(str(db.save(user_obj)))
+
+    
+
+
+    if request.method == 'GET':
+        if id=='ga':
+            return getAll()
+        return getUser(id)
+
+    elif request.method == 'POST':
+        return addUser(request.json)
+
+    elif request.method == 'DELETE':
+        if id =='ra':
+            return deleteAll()        
+        return removeUser(id)
+
+
+
+
 @app.route('/signup', methods=['GET','POST']) #create a /signup route which    
 def signup():
     db = mongo.heart.users
@@ -152,8 +202,10 @@ def signup():
         } 
         user = db.find()   
         if (user.count() ==0): 
-            if (user_obj['psw'] == user_obj['re_psw']):                
-                session['id'] = db.save(user_obj) 
+            if (user_obj['psw'] == user_obj['re_psw']):   
+
+                
+                session['id'] = str(db.save(user_obj))                                
                 success = 'User Registered'
                 flash('You have Successfully Registered', 'success') 
                 isLoggedin = True
@@ -165,7 +217,7 @@ def signup():
                 return render_template('index.html', data=success, isLoggedin=True)
         else:
             for u in user:
-                return jsonify(str(u),str(user_obj))
+                # return jsonify(str(u),str(user_obj))
                 if ((u['email'] == user_obj['email'])) :
                     if ((user_obj['psw'] == user_obj['re_psw'])):
                         success = 'User Exists'
@@ -183,23 +235,56 @@ def signup():
         isLoggedin = True
         return render_template('index.html', data=success, isLoggedin=True)
             
-@app.route('/form/<id>')
+
+
+@app.route('/form/<id>',methods=["POST","GET"])
 def form(id):
-    return render_template('form.html');
+    # 5f8dcf2e5402625b32bfec1b
+    db = mongo.heart.users     
+    user = db.find()
+    if request.method == 'GET':    
+        for u in user:
+            form_object = {
+                str(ObjectId()) :{
+                    "contents":"",
+                    "results":"",
+                    "status":"Unfilled",
+                    "checked":"Unchecked",
+                }
+            }
+
+            checkups = list(u["checkups"])
+            for entry in checkups:
+                if list(entry.keys())[0] == id:
+                    if entry[id]['status'] == 'Unfilled':
+                        return render_template('form.html')
+                    else:
+                        return jsonify(str(entry))
+
+
+    elif request.method == 'POST':
+        return True
 
 
 
 @app.route('/add')
 def add_checkup():
-    db = mongo.heart.users 
-    user = db.find(session['id'])
-    form_object = {
-        "contents":"",
-        "results":"",
-        "status":"Unfilled",
-        "checked":"Unchecked",
-    }
-    val = user.save(form_object)
+    db = mongo.heart.users     
+    user = db.find({"_id":ObjectId(session['id'])})
+        
+    for u in user:
+        form_object = {
+            str(ObjectId()) :{
+                "contents":"",
+                "results":"",
+                "status":"Unfilled",
+                "checked":"Unchecked",
+            }
+        }
+        update = list(u["checkups"])
+        update.append(form_object)
+        
+        val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : update}})
     
     return jsonify(str(val))
 
@@ -222,11 +307,11 @@ def login():
             return render_template('index.html', data=success)
         else:
             for u in user:
-                session['id'] = u['_id']
+                session['id'] = str(u['_id'])
                 if ((u['email'] == data[0])) :
                     if ((u['psw'] == data[1])):
                         checkups = u['checkups']
-                        return jsonify(checkups)
+                        # return jsonify(checkups)
                         return render_template('dashboard.html',checkups = checkups)
                     else:
                         success = 'Sorry'
@@ -251,6 +336,12 @@ def contact():
             "message" : request.form['message']    
         }
         return render_template('thank-you.html', data=data)
+
+@app.route('/logout')
+def logout():
+    session.pop('id', None)
+    isLoggedin = False
+    return render_template('index.html', isLoggedin=isLoggedin)
 
 @app.route('/user-data', methods=['POST'])
 def process_user_data():
@@ -926,11 +1017,5 @@ def process_user_data():
 
     return render_template('result.html',data=data) 
     
-
-@app.route('/logout')
-def logout():
-    session.pop('id', None)
-    isLoggedin = False
-    return render_template('index.html', isLoggedin=isLoggedin)
 
 app.run(debug=True) 
