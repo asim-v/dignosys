@@ -1,44 +1,329 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-	<title></title>
+  <meta charset="utf-8">
+
+  {% if data %}
+  	<meta name="json" content="{{data[(data.keys()|list)[0]]['contents']}}">
+  {% endif %}
+  
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to the Prediction</title>
+  <meta name="description" content="Free Bootstrap Theme by BootstrapMade.com">
+  <meta name="keywords" content="free website templates, free bootstrap themes, free template, free bootstrap, free website template">
+
+  <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
+  <script src="../static/js/sweetalert2.all.min.js"></script>
+  <link rel="stylesheet" href="../static/css/sweetalert2.min.css">
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/font-awesome.min.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script>
+    var preloader = document.getElementById('preloader')
+    // window.onload = () => {
+    //   preloader.classList.toggle('hide');
+    // } 
+    document.onreadystatechange = function () {
+    var state = document.readyState
+    if (state == 'interactive') {
+          document.getElementById('myPage').style.visibility="hidden";
+          document.getElementById('preloader').style.visibility="visible";
+      } else if (state == 'complete') {
+          setTimeout(function(){
+            document.getElementById('interactive');
+            document.getElementById('preloader').style.visibility="hidden";
+            document.getElementById('myPage').style.visibility="visible";
+          },1000);  
+      }
+    }
+  </script>
+  <style>
+  .preloader {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 99999 !important;
+  }
+
+  .show {
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 99999 !important;
+    }
+
+  .hide {
+    display: none;
+  }
+
+  svg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 99999 !important;
+  }
+
+  .beat-loader {
+    stroke: rgba(28, 74, 90, 0.9);
+    stroke-dasharray: 175;
+    stroke-dashoffset: 350;
+    -webkit-animation: draw 1.4s linear;
+    -moz-animation: draw 1.4s linear;
+    animation: draw 1.4s linear;
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+  }
+
+  @-webkit-keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @-moz-keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .green{
+  	background-color: #32a4a4;
+  	float: right;
+  }
+  a i{
+  	color: #ffb737 !important;
+  }
+  </style>
 </head>
-<body>
 
-	<div class="container pt-4">
+<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
+	<div id="preloader" class="preloader">
+		<svg width="250px" height="250px" viewBox="0 0 54 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+		  <defs></defs>
+		  <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+		    <path class="beat-loader" d="M0.5,38.5 L16,38.5 L19,25.5 L24.5,57.5 L31.5,7.5 L37.5,46.5 L43,38.5 L53.5,38.5" id="Path-2" stroke-width="2" sketch:type="MSShapeGroup"></path>
+		  </g>
+		</svg>
+	</div>
+	<!--banner-->
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+		  <div class="col-md-12">
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		    </div>
+		    <div class="collapse navbar-collapse navbar-right" id="myNavbar">
+		      <ul class="nav navbar-nav">
+		        <li class="active"><a href="/">Home</a></li>		       
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+	</nav>
 
-	<form method="POST" action="" id="form">
-		
-		<input name="age" placeholder="age" value="" type="text" autofocus class="form-control"><br>
-		<input name="sex" placeholder="sex" value="" type="text" autofocus class="form-control"><br>
-		<input name="cp" placeholder="cp" value="" type="text" autofocus class="form-control"><br>
-		<input name="trestbps" placeholder="trestbps" value="" type="text" autofocus class="form-control"><br>
-		<input name="chol" placeholder="chol" value="" type="text" autofocus class="form-control"><br>
-		<input name="fbs" placeholder="fbs" value="" type="text" autofocus class="form-control"><br>
-		<input name="restecg" placeholder="restecg" value="" type="text" autofocus class="form-control"><br>
-		<input name="thalach" placeholder="thalach" value="" type="text" autofocus class="form-control"><br>
-		<input name="exang" placeholder="exang" value="" type="text" autofocus class="form-control"><br>
-		<input name="oldpeak" placeholder="oldpeak" value="" type="text" autofocus class="form-control"><br>
-		<input name="slope" placeholder="slope" value="" type="text" autofocus class="form-control"><br>
-		<input name="ca" placeholder="ca" value="" type="text" autofocus class="form-control"><br>
-		<input name="thal" placeholder="thal" value="" type="text" autofocus class="form-control"><br>
+	<div class="container pt-4" style="padding-top: 100px;padding-bottom: 100px;">
+		<div class="row">
+			<div class="col-lg-3 col-sm-4 col-xs-12">
+	          <div class="section-title">
+	            <h2 class="head-title lg-line">Your Form </h2>
+	            <hr class="botm-line">
+	            <p class="sec-para">Upload anonymously to the blockchain your information so that your doctor utilize state of the art detcetion systems to diagnose possible risk factors</p> 
+	          </div>
+	        </div>
+			<div class="col-md-8">
+				<form method="POST" action="" id="form">
 
-		<button onclick="validate()" type="submit" href="/update" class="btn btn-primary " id="save_button">Analyze</button>
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="age" placeholder="Age in years" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="sex" placeholder="(1 = male; 0 = female)" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="cp" placeholder="Chest Pain Type" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="trestbps" placeholder="Resting blood pressure (in mm Hg on admission to the hospital)" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="chol" placeholder="Serum cholestoral in mg/dl" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="fbs" placeholder="(fasting blood sugar &gt; 120 mg/dl) (1 = true; 0 = false)" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="restecg" placeholder="Resting electrocardiographic results" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="thalach" placeholder="Maximum heart rate achieved" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="exang" placeholder="Exercise induced angina (1 = yes; 0 = no)" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="oldpeak" placeholder="ST depression induced by exercise relative to rest" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="slope" placeholder="The slope of the peak exercise ST segment" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="ca" placeholder="Number of major vessels (0-3) colored by flourosopy" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<input name="thal" placeholder="3 = normal; 6 = fixed defect; 7 = reversable defect" value="" type="text" autofocus class="form-control"><br>
+						</div>
+						<div class="col-sm-1">
+							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						</div>
+					</div>					
+					<div class="row">
+						<div class="col-sm-11">
+							<button onclick="validate()" type="submit" href="/update" class="btn btn-primary green " id="save_button">Submit</button>
+						</div>				
+						<div class="col-sm-1">	
+						</div>
+					</div>						
+				</form>
+			</div>
 
+			<div class="col-md-1"></div>
+		</div>
 	</div>
 
-</form>
-
 </body>
+<!--footer-->
+<footer id="footer" style="bottom: 0;position: fixed;width: 100%;}">
+<div class="footer-line">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        © All Rights Reserved By Dignosys
+        <div class="credits">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</footer>
+<!--/ footer-->
+
 
 <script type="text/javascript">
-function validate(){
-  $("#save_button").html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando ...');
-}	
-var url = window.location.pathname.split("/");
-var id = window.location.pathname.split("/")[url.length-1];
-document.getElementById("form").action = "/form/"+id
-</script>
+		
+	function connect_to_backend(){
+		try{
+			var url = window.location.pathname.split("/");
+			var id = window.location.pathname.split("/")[url.length-1];
+			document.getElementById("form").action = "/form/"+id;
+		}catch(err){
+			console.log(err);
+			flash("Error connecting to backend");
+		}
+	}
+	function prefill(){
+		var meta = document.querySelector('meta[name="json"]').content.replaceAll("'",'"');		
+		if (meta.length > 0){
+			var description = JSON.parse(meta);
+			console.log(description)
+			var elements = document.getElementById("form").elements;
+			for (var i = 0, element; element = elements[i++];) {
+			    if (element.type === "text"){
 
+			    	var aimed = element.name;			    	
+			    	element.value = description[aimed];
+			    	
+			    }
+			}			
+
+		}
+	}
+	connect_to_backend();
+	prefill();
+	
+
+</script>
+  <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
+  <script src="static/js/jquery.min.js"></script>
+  <script src="static/js/jquery.easing.min.js"></script>
+  <script src="static/js/bootstrap.min.js"></script>
+  <script src="static/js/custom.js"></script>
+  <script src="static/contactform/contactform.js"></script>
 </html>

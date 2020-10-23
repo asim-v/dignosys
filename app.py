@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, request, jsonify, session
+from flask import Flask, flash, render_template, request, jsonify, session, url_for, redirect
 from bson.objectid import ObjectId
 import pymongo
 import math
@@ -13,7 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.externals import joblib
+import joblib
 from sklearn.exceptions import ConvergenceWarning
 from warnings import simplefilter
 
@@ -244,37 +244,91 @@ def form(id):
     user = db.find()
     if request.method == 'GET':    
         for u in user:
-            form_object = {
-                str(ObjectId()) :{
-                    "contents":"",
-                    "results":"",
-                    "status":"Unfilled",
-                    "checked":"Unchecked",
-                }
-            }
-
             checkups = list(u["checkups"])
             for entry in checkups:
                 if list(entry.keys())[0] == id:
                     if entry[id]['status'] == 'Unfilled':
                         return render_template('form.html')
                     else:
-                        return jsonify(str(entry))
+                        return render_template('form.html',data=entry)
 
 
     elif request.method == 'POST':
-        return True
+        data = {
+            "age": request.form['age'],
+            "sex": request.form['sex'],
+            "cp": request.form['cp'],
+            "trestbps": request.form['trestbps'],
+            "chol": request.form['chol'],
+            "fbs": request.form['fbs'],
+            "restecg": request.form['restecg'],
+            "thalach": request.form['thalach'],
+            "exang": request.form['exang'],
+            "oldpeak": request.form['oldpeak'],
+            "slope": request.form['slope'],
+            "ca": request.form['ca'],
+            "thal": request.form['thal']
+        } 
+
+        for u in user:
+            checkups = list(u["checkups"])
+            untilnow = str(u["_id"])
+            for entry in checkups:
+                if list(entry.keys())[0] == id:
+                    if entry[id]['contents'] == '':
+                        
+                        checkup_list = u["checkups"]
+                        for i,element in enumerate(u["checkups"]):
+                            if list(element.keys())[0] == id:                                
+                                checkup_list[i][id]['contents'] = data
+                                checkup_list[i][id]['status'] = 'Filled'
+                                # return jsonify(checkup_list)
 
 
+                        val = db.update({'_id' : ObjectId(u["_id"])}, {'$set' : {'checkups' : checkup_list }})
+                        return render_template('form.html')
+                    else:
+                        # return jsonify(str(entry))
+                        return render_template('form.html',data=str(entry))
+
+
+        # return jsonify(process_user_data(data))
+
+@app.route('/analyze/<id>')
+def analyze(id):
+
+    # for debugging UI
+    # return jsonify(id)
+
+    db = mongo.heart.users     
+    user = db.find({"_id":ObjectId(session['id'])})
+        
+    for u in user:
+        
+        checkup_list = u["checkups"]
+        for i,element in enumerate(u["checkups"]):
+            if list(element.keys())[0] == id:                                
+                checkup_list[i][id]['results'] = process_user_data(data)
+                checkup_list[i][id]['checked'] = 'checked'
+                return jsonify(checkup_list)
+
+
+        # update = list(u["checkups"])
+        # update.append(form_object)
+    val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : checkup_list}})
+    
+    return jsonify(str(val))
 
 @app.route('/add')
 def add_checkup():
     db = mongo.heart.users     
     user = db.find({"_id":ObjectId(session['id'])})
-        
+    location = ObjectId()
+
     for u in user:
+
         form_object = {
-            str(ObjectId()) :{
+            str(location) :{
                 "contents":"",
                 "results":"",
                 "status":"Unfilled",
@@ -283,11 +337,18 @@ def add_checkup():
         }
         update = list(u["checkups"])
         update.append(form_object)
-        
         val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : update}})
     
-    return jsonify(str(val))
+    return jsonify(location)
 
+@app.route('/dashboard')
+def dashboard():
+    db = mongo.heart.users     
+    user = db.find({"_id":ObjectId(session['id'])})
+    
+    for u in user: checkups = u['checkups']
+
+    return render_template('dashboard.html',checkups = checkups)
 
 
 
@@ -310,9 +371,10 @@ def login():
                 session['id'] = str(u['_id'])
                 if ((u['email'] == data[0])) :
                     if ((u['psw'] == data[1])):
-                        checkups = u['checkups']
+                        # checkups = u['checkups']
                         # return jsonify(checkups)
-                        return render_template('dashboard.html',checkups = checkups)
+                        # return render_template('dashboard.html',checkups = checkups)
+                        return redirect(url_for('dashboard'))
                     else:
                         success = 'Sorry'
                         flash('Please check email / password', 'error') 
@@ -323,6 +385,8 @@ def login():
                 flash('Please Create an Account', 'error') 
                 isLoggedin = True  
                 return render_template('index.html', data=success, isLoggedin=True)
+
+
 
 @app.route('/contact', methods=['GET','POST'])
 def contact():
@@ -343,23 +407,9 @@ def logout():
     isLoggedin = False
     return render_template('index.html', isLoggedin=isLoggedin)
 
-@app.route('/user-data', methods=['POST'])
-def process_user_data():
-    data = {
-        "age": request.form['age'],
-        "sex": request.form['sex'],
-        "cp": request.form['cp'],
-        "trestbps": request.form['trestbps'],
-        "chol": request.form['chol'],
-        "fbs": request.form['fbs'],
-        "restecg": request.form['restecg'],
-        "thalach": request.form['thalach'],
-        "exang": request.form['exang'],
-        "oldpeak": request.form['oldpeak'],
-        "slope": request.form['slope'],
-        "ca": request.form['ca'],
-        "thal": request.form['thal']
-    } 
+
+def process_user_data(data):
+
     data = pd.DataFrame(data, index=[0])
     for v in data['sex']:
         if( v == 'male' ):
@@ -394,7 +444,6 @@ def process_user_data():
     }
     
     if((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
-        print('Iam here')
         prob = {
         "prob_1" : val[2]*100, 
         "prob_2" : val2[2]*100,
@@ -403,7 +452,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -413,7 +462,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -423,7 +472,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -433,7 +482,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -443,7 +492,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -453,7 +502,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -463,7 +512,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -473,7 +522,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -483,7 +532,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -493,7 +542,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -503,7 +552,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -513,7 +562,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -523,7 +572,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -533,7 +582,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -543,7 +592,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -553,7 +602,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -563,7 +612,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -573,7 +622,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -583,7 +632,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -593,7 +642,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -603,7 +652,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -613,7 +662,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -623,7 +672,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -633,7 +682,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -643,7 +692,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -653,7 +702,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -663,7 +712,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -673,7 +722,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -683,7 +732,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -693,7 +742,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -703,7 +752,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -713,7 +762,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -723,7 +772,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -733,7 +782,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -743,7 +792,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -753,7 +802,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -763,7 +812,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -773,7 +822,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -783,7 +832,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -793,7 +842,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -803,7 +852,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -813,7 +862,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -823,7 +872,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -833,7 +882,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }   
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -843,7 +892,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -853,7 +902,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -863,7 +912,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -873,7 +922,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -883,7 +932,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -893,7 +942,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -903,7 +952,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -913,7 +962,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -923,7 +972,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -933,7 +982,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -943,7 +992,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -953,7 +1002,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -963,7 +1012,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -973,7 +1022,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -983,7 +1032,7 @@ def process_user_data():
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy) 
+        return (data, prob, accuracy) 
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -993,7 +1042,7 @@ def process_user_data():
         "prob_5" : val5[2]*100, 
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1003,7 +1052,7 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1013,9 +1062,9 @@ def process_user_data():
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return render_template('result.html',data=data, data1=prob, data2=accuracy)
+        return (data, prob, accuracy)
 
-    return render_template('result.html',data=data) 
+    return jsonify(data)
     
 
 app.run(debug=True) 

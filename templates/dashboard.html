@@ -4,9 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Welcome to the Prediction</title>
-  <meta name="description" content="Free Bootstrap Theme by BootstrapMade.com">
-  <meta name="keywords" content="free website templates, free bootstrap themes, free template, free bootstrap, free website template">
+  <title>Dignosys Dashboard</title>
 
   <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
   <script src="../static/js/sweetalert2.all.min.js"></script>
@@ -14,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/font-awesome.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script>
@@ -92,7 +91,16 @@
       stroke-dashoffset: 0;
     }
   }
-
+  .identifier a{
+    font-family: monospace;
+    color: #448ba4 !important;
+    text-decoration: none !important;
+  }
+  .analyze{
+    background: none;
+    border:none;
+    display: contents;
+  }
   </style>
 </head>
 
@@ -145,9 +153,13 @@
             <div class="more-features-box-text" id="{{(checkup.keys()|list)[0]}}">
               <div class="row">
                 <div class="col-sm-6">
-                  <div class="more-features-box-text-icon"> <i class="fa fa-play" aria-hidden="true"></i> </div>
+                  <button onClick="analyze(this.id)" class="analyze" id="button:{{(checkup.keys()|list)[0]}}">
+                    <div class="more-features-box-text-icon">
+                      <i class="fa fa-play" aria-hidden="true"></i>
+                    </div>
+                  </button>
                   <div class="more-features-box-text-description">
-                    <h3><a href="/form/{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}   </a></h3>
+                    <h3 class="identifier"><a href="/form/{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}   </a></h3>
                     <p>Unfilled</p>
                     
                     
@@ -207,24 +219,27 @@
                 </div>
               </div>
             </div>              
-            {% endfor%}
-                    
+            {% endfor%}              
+
+
           </div>
-
-          <div class="more-features-box-text">
+          <div class="more-features-box-text">  
             <div class="row">
-              <div class="col-lg-12">
-                <div class="more-features-box-text-icon"> <i class="fa fa-plus" aria-hidden="true"></i> </div>
-                <div class="more-features-box-text-description">
+              <div class="col-sm-12">
+
+                  <div class="col-lg-12">
+                    <div class="more-features-box-text-icon"> <i class="fa fa-plus" aria-hidden="true"></i> </div>
+                    <div class="more-features-box-text-description">
 
 
-                  <h3 class="ghost"><button onclick="createForm()" class="createform">Create Form</button></h3>
+                      <h3 class="ghost"><button onclick="createForm()" class="createform">Create Form</button></h3>
 
-                </div>
-              </div>
+                    </div>
+                  </div>
 
-            </div>
-          </div>  
+              </div>                
+            </div>  
+          </div>
 
         </div>
       </div>
@@ -271,6 +286,11 @@
     xhttp.send();
   }
   
+  </script>
+  
+  <script type="text/javascript">
+    
+
   // READMROE
     var el = document.querySelector('.more');
     var btn = el.querySelector('.more-btn');
@@ -301,37 +321,31 @@
 
     btn.addEventListener('click', showMenu, false);
 
-      var el = document.querySelector('.more');
-    var btn = el.querySelector('.more-btn');
-    var menu = el.querySelector('.more-menu');
-    var visible = false;
 
-    function showMenu(e) {
-        e.preventDefault();
-        if (!visible) {
-            visible = true;
-            el.classList.add('show-more-menu');
-            menu.setAttribute('aria-hidden', false);
-            document.addEventListener('mousedown', hideMenu, false);
-        }
-    }
-
-    function hideMenu(e) {
-        if (btn.contains(e.target)) {
-            return;
-        }
-        if (visible) {
-            visible = false;
-            el.classList.remove('show-more-menu');
-            menu.setAttribute('aria-hidden', true);
-            document.removeEventListener('mousedown', hideMenu);
-        }
-    }
-
-    btn.addEventListener('click', showMenu, false);
 
   </script>
-  
+  <script type="text/javascript">
+    function analyze(id){
+      document.getElementById(id).firstElementChild.style.backgroundColor = "#005d5c";
+      document.getElementById(id).firstElementChild.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>';
+      var checkupid = id.split(":")[id.split(":").length-1]      
+      // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById(id).firstElementChild.style.backgroundColor = "#0cb8b6";
+          document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
+          var response = this.responseText;
+          console.log(response);
+        }
+      };
+      xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
+      xhttp.send();      
+    }
+  </script>
+
+
   <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
   <script src="static/js/jquery.min.js"></script>
   <script src="static/js/jquery.easing.min.js"></script>
