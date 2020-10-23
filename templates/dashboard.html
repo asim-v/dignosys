@@ -12,7 +12,7 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway|Candal">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/font-awesome.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script>
@@ -93,8 +93,14 @@
   }
   .identifier a{
     font-family: monospace;
-    color: #448ba4 !important;
+    color: #396e7f !important;
     text-decoration: none !important;
+  }
+  @media (max-width: 600px){
+    .identifier a{
+      font-size: 20px;
+
+    }
   }
   .analyze{
     background: none;
@@ -141,86 +147,91 @@
       <div class="row">
         <div class="col-lg-2 col-sm-4 col-xs-12">
           <div class="section-title">
-            <h2 class="head-title lg-line">Your Checkups </h2>
+            <h2 class="head-title lg-line">Your Anonymous Checkups </h2>
             <hr class="botm-line">
             <p class="sec-para">Apply state of the art models that update real time to better enhance the data</p> 
           </div>
         </div>
         <div class="col-lg-10 col-sm-8 col-xs-12">
           <div class="col-sm-12 more-features-box list" id="panel">
-            {{checkups}}
-            {% for checkup in checkups%}
-            <div class="more-features-box-text" id="{{(checkup.keys()|list)[0]}}">
+            <!-- {{checkups}} -->
+            {% if checkups|length > 0%}
+              {% for checkup in checkups%}
               <div class="row">
-                <div class="col-sm-6">
-                  <button onClick="analyze(this.id)" class="analyze" id="button:{{(checkup.keys()|list)[0]}}">
-                    <div class="more-features-box-text-icon">
-                      <i class="fa fa-play" aria-hidden="true"></i>
+                <div class="more-features-box-text" id="{{(checkup.keys()|list)[0]}}">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <button onClick="analyze(this.id)" class="analyze" id="button:{{(checkup.keys()|list)[0]}}">
+                        <div class="more-features-box-text-icon">
+                          <i class="fa fa-play" aria-hidden="true"></i>
+                        </div>
+                      </button>
+                      <div class="more-features-box-text-description">
+                        <h3 class="identifier"><a href="/form/{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}   </a></h3>
+                        <p class="status">Unfilled</p>
+                        
+                        
+                      </div>
                     </div>
-                  </button>
-                  <div class="more-features-box-text-description">
-                    <h3 class="identifier"><a href="/form/{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}   </a></h3>
-                    <p>Unfilled</p>
-                    
-                    
-                  </div>
-                </div>
-                <div class="col-sm-5">
-                  <div class="count">
-                    50%;
-                  </div>
-                  <div class="count">
-                    50%;
-                  </div>
-                  <div class="count">
-                    50%;
-                  </div>
-                  <div class="count">
-                    50%;
-                  </div>
-                  <div class="count">
-                    50%;
-                  </div>
-                  <div class="count">
-                    50%;
-                  </div>
+                    <div class="col-sm-5" >
+                      <div class="countbox">
+                        <div class="count">
+                          50%;
+                        </div>
+                        <div class="count">
+                          50%;
+                        </div>
+                        <div class="count">
+                          50%;
+                        </div>
+                        <div class="count">
+                          50%;
+                        </div>
+                        <div class="count">
+                          50%;
+                        </div>
+                        <div class="count">
+                          50%;
+                        </div>
+                      </div>
 
-                </div>
-                <div class="col-sm-1">      
+                    </div>
+                    <div class="col-sm-1">      
 
 
-                    <div class="menu-container">
-                        <div class="more">
-                            <button id="more-btn" class="more-btn">
-                                <i class="fas fa-ellipsis-v" style="padding-right: 15px;"></i>
+                        <div >
+                            <div class="more" id="more:{{(checkup.keys()|list)[0]}}">
+                                <button id="more-btn" class="more-btn">
+                                    <i class="fas fa-ellipsis-v" style="padding-right: 15px;"></i>
 
-                            </button>
-                            <div class="more-menu">
-                                <div class="more-menu-caret">
-                                    <div class="more-menu-caret-outer"></div>
-                                    <div class="more-menu-caret-inner"></div>
+                                </button>
+                                <div class="more-menu">
+                                    <div class="more-menu-caret">
+                                        <div class="more-menu-caret-outer"></div>
+                                        <div class="more-menu-caret-inner"></div>
+                                    </div>
+                                    <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true">
+                                        <li class="more-menu-item" role="presentation">
+                                            <button type="button" class="more-menu-btn" role="menuitem">Update Status</button>
+                                        </li>
+                                        <li class="more-menu-item" role="presentation">
+                                            <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button>
+                                        </li>
+                                        <li class="more-menu-item" role="presentation">
+                                            <button type="button" class="more-menu-btn" role="menuitem">Delete</button>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true">
-                                    <li class="more-menu-item" role="presentation">
-                                        <button type="button" class="more-menu-btn" role="menuitem">Update Status</button>
-                                    </li>
-                                    <li class="more-menu-item" role="presentation">
-                                        <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button>
-                                    </li>
-                                    <li class="more-menu-item" role="presentation">
-                                        <button type="button" class="more-menu-btn" role="menuitem">Delete</button>
-                                    </li>
-                                </ul>
                             </div>
                         </div>
+
+                      
                     </div>
-
-                  
-                </div>
-              </div>
-            </div>              
-            {% endfor%}              
-
+                  </div>
+                </div>       
+              </div>       
+              {% endfor%}              
+            {% endif%}
 
           </div>
           <div class="more-features-box-text">  
@@ -289,13 +300,6 @@
   </script>
   
   <script type="text/javascript">
-    
-
-  // READMROE
-    var el = document.querySelector('.more');
-    var btn = el.querySelector('.more-btn');
-    var menu = el.querySelector('.more-menu');
-    var visible = false;
 
     function showMenu(e) {
         e.preventDefault();
@@ -303,7 +307,9 @@
             visible = true;
             el.classList.add('show-more-menu');
             menu.setAttribute('aria-hidden', false);
+            menu.setAttribute('z-index',100);
             document.addEventListener('mousedown', hideMenu, false);
+
         }
     }
 
@@ -319,29 +325,46 @@
         }
     }
 
-    btn.addEventListener('click', showMenu, false);
-
-
-
+    try{
+      // READMROE
+      var el = document.querySelector('.more');
+      var btn = el.querySelector('.more-btn');
+      var menu = el.querySelector('.more-menu');
+      var visible = false;
+      btn.addEventListener('click', showMenu, false);
+    }catch(err){
+      console.log(err)
+    }
   </script>
+
+
+
   <script type="text/javascript">
     function analyze(id){
       document.getElementById(id).firstElementChild.style.backgroundColor = "#005d5c";
-      document.getElementById(id).firstElementChild.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>';
+      document.getElementById(id).firstElementChild.innerHTML = '<div class="loading-pulse"></div>';
       var checkupid = id.split(":")[id.split(":").length-1]      
       // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
       
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          document.getElementById(id).firstElementChild.style.backgroundColor = "#0cb8b6";
-          document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
+          document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
+          document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
           var response = this.responseText;
           console.log(response);
         }
       };
       xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
       xhttp.send();      
+    }
+    function heatMapColorforValue(value){
+      var h = (1.0 - value) * 240
+      return "hsl(" + h + ", 100%, 50%)";
+    }
+    function heatDetection(){
+      var panel = document.getElementById("panel")
+
     }
   </script>
 

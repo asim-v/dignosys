@@ -307,28 +307,32 @@ def analyze(id):
         
         checkup_list = u["checkups"]
         for i,element in enumerate(u["checkups"]):
-            if list(element.keys())[0] == id:                                
-                checkup_list[i][id]['results'] = process_user_data(data)
-                checkup_list[i][id]['checked'] = 'checked'
-                return jsonify(checkup_list)
-
+            try:
+                if list(element.keys())[0] == id:                                
+                    checkup_list[i][id]['results'] = str(process_user_data(data))
+                    checkup_list[i][id]['checked'] = 'checked'
+                    # return jsonify(str(checkup_list))
+                    val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : checkup_list}})
+                    return jsonify(str(val))
+            except Exception as e:
+                return jsonify(str(e))
 
         # update = list(u["checkups"])
         # update.append(form_object)
-    val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : checkup_list}})
+        
     
-    return jsonify(str(val))
+    
 
 @app.route('/add')
 def add_checkup():
     db = mongo.heart.users     
     user = db.find({"_id":ObjectId(session['id'])})
-    location = ObjectId()
+    location = str(ObjectId())
 
     for u in user:
 
         form_object = {
-            str(location) :{
+            location :{
                 "contents":"",
                 "results":"",
                 "status":"Unfilled",

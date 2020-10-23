@@ -9,6 +9,7 @@ body {
 	font-family: 'Open Sans', sans-serif;
 	line-height: 20px;
 	color: #999999;
+    overflow-x: hidden !important;
 	font-size: 300;
 	font-size: 16px;
 }
@@ -60,6 +61,7 @@ hr.botm-line {
 /***************************************
 banner
 ***************************************/
+
 .count{
     display: inline-flex;
     background-color: #ff00002b;
@@ -69,6 +71,67 @@ banner
     padding-right: 2%;
     border-radius: 5px;
     font-weight: 600;
+}
+.countbox{
+    position: absolute;
+    right: 0;
+    min-width: 350px;
+}
+@media only screen and (max-width: 1200px){
+    .countbox{
+        padding-top: 35px;
+    }
+}
+@media only screen and (max-width: 995px){
+    .countbox{
+        padding-top: 35px;
+        right: -91px;
+    }
+    .more {
+        position: absolute;
+        right: 0;
+        top: -100px;
+    }    
+}
+@media only screen and (max-width: 768px){
+    .countbox{
+        top: -60px;
+        padding-top: 0;
+        right: -30px;
+    }
+    .more {
+        position: absolute;
+        right: 0;
+        top: -80px;
+    }
+    .more-menu{
+        left: -100px;
+    }
+    .more-menu-caret{
+        left: 100px !important;
+    }
+
+}
+@media only screen and (max-width: 468px){
+    .countbox{
+        top: -32px;
+        padding-top: 0;
+        right: -30px;
+    }
+    .status{
+        top: 25px;
+        font-size: 10px;
+        position: absolute;
+    }
+    .more-features-box-text{
+        height: 100px;
+    }
+    .more-features-box-text-description{
+        margin-left: 50px !important;
+    }
+    .col-sm-6{
+        padding-left: 0 !important;
+    }
 }
 .createform{
     pointer-events: all;
@@ -379,7 +442,7 @@ testimonial
     border-style: solid;
     border-width: 15px;
     border-color: transparent;
-    z-index: -1;
+    
     box-shadow: 3px -13px 5px 0px rgba(0, 0, 0, 0.18);
     border-left: 0;
 }
@@ -573,12 +636,13 @@ button:active:focus, button:focus {
 /* Page */
 
 .menu-container {
+    
     position: absolute;
     top: 50%;
     left: 50%;
     margin-right: -50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    /*-webkit-transform: translate(-50%, -50%);*/
+    /*transform: translate(-50%, -50%);*/
     text-align: center;
 }
 
@@ -591,7 +655,7 @@ button:active:focus, button:focus {
 
 .more-btn,
 .more-menu-btn {
-    background: #fff;
+    background: none !important;
     border: 0 none;
     line-height: normal;
     overflow: visible;
@@ -619,7 +683,7 @@ button:active:focus, button:focus {
     width: fit-content;
     position: absolute;
     top: 100%;
-    z-index: 10;
+    
     float: left;
     padding: 10px 0;
     margin-top: 9px;
@@ -708,6 +772,8 @@ button:active:focus, button:focus {
 }
 
 .show-more-menu .more-menu {
+    position: absolute;
+    z-index: 100;
     opacity: 1;
     -webkit-transform: translate(0, 0) scale(1);
     transform: translate(0, 0) scale(1);
@@ -717,3 +783,86 @@ button:active:focus, button:focus {
     visibility: visible;
     z-index: 0;
 }*/
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes pulse {
+  50% {
+    background: white;
+  }
+}
+@keyframes pulse {
+  50% {
+    background: white;
+  }
+}
+html, body {
+  height: 100%;
+}
+
+
+.loading {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border: 0.25rem solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  -webkit-animation: spin 1s infinite linear;
+          animation: spin 1s infinite linear;
+}
+
+.loading-pulse {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+
+  width: 6px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  -webkit-animation: pulse 750ms infinite;
+          animation: pulse 750ms infinite;
+  -webkit-animation-delay: 250ms;
+          animation-delay: 250ms;
+}
+.loading-pulse:before, .loading-pulse:after {
+  content: '';
+  position: absolute;
+  display: block;
+  height: 16px;
+  width: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  -webkit-animation: pulse 750ms infinite;
+          animation: pulse 750ms infinite;
+}
+.loading-pulse:before {
+  left: -12px;
+}
+.loading-pulse:after {
+  left: 12px;
+  -webkit-animation-delay: 500ms;
+          animation-delay: 500ms;
+}
