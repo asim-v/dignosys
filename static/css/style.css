@@ -98,6 +98,8 @@ banner
     width: 150px;
 }.modal_data_span{
     width: 28px
+}.compress{
+    transition: fade 0.5s;
 }
 @media only screen and (max-width: 1200px){
     .countbox{
@@ -127,10 +129,10 @@ banner
         top: -80px;
     }
     .more-menu{
-        left: -100px;
+        left: -60px;
     }
     .more-menu-caret{
-        left: 100px !important;
+        left: 60px !important;
     }
 
 }
@@ -688,7 +690,7 @@ button:active:focus, button:focus {
     width: 100%;
     text-align: left;
     outline: none;
-    cursor: pointer;
+    
 }
 
 .more-dot {
@@ -718,7 +720,7 @@ button:active:focus, button:focus {
     -webkit-transform: translate(0, 15px) scale(.95);
     transform: translate(0, 15px) scale(.95);
     transition: transform 0.1s ease-out, opacity 0.1s ease-out;
-    pointer-events: none;
+    pointer-events: all;
 }
 
 .more-menu-caret {

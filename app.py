@@ -322,9 +322,31 @@ def analyze(id):
         # update.append(form_object)
         
     
-@app.route('/delete/<id>')
+@app.route('/delete/<id>',methods=['DELETE'])
 def delete(id):
-    return jsonify('OK')
+    # for debugging UI
+    # return jsonify(id)
+
+    db = mongo.heart.users     
+    user = db.find({"_id":ObjectId(session['id'])})
+        
+    for u in user:
+        
+        checkup_list = u["checkups"]
+        for i,element in enumerate(u["checkups"]):
+            try:
+                if list(element.keys())[0] == id:        
+                    
+                    checkup_list.pop(i)
+                    
+
+                    val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : checkup_list}})
+                    return jsonify(val)
+            except Exception as e:
+                return jsonify(str(e))
+
+        # update = list(u["checkups"])
+        # update.append(form_object)
 
 
 @app.route('/add')
@@ -355,7 +377,7 @@ def dashboard():
     user = db.find({"_id":ObjectId(session['id'])})
     
     for u in user: checkups = u['checkups']
-
+    
     return render_template('dashboard.html',checkups = checkups)
 
 

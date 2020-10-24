@@ -154,10 +154,11 @@
         </div>
         <div class="col-lg-10 col-sm-8 col-xs-12">
           <div class="col-sm-12 more-features-box list" id="panel">
+
             {{checkups}}
             {% if checkups|length > 0%}
               {% for checkup in checkups%}
-              <div class="row" id="{{(checkup.keys()|list)[0]}}">
+              <div class="row" id="{{(checkup.keys()|list)[0]}}" class="compress">
                 <div class="more-features-box-text" >
                   <div class="row">
                     <div class="col-sm-6">
@@ -232,14 +233,14 @@
                                         <div class="more-menu-caret-inner"></div>
                                     </div>
                                     <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true">
-<!--                                         <li class="more-menu-item" role="presentation">
+                                        <!-- <li class="more-menu-item" role="presentation">
                                             <button type="button" class="more-menu-btn" role="menuitem">Update Status</button>
                                         </li>
                                         <li class="more-menu-item" role="presentation">
                                             <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button>
                                         </li> -->
                                         <li class="more-menu-item" role="presentation">
-                                            <button type="button" class="more-menu-btn" role="menuitem" id="delete:{{(checkup.keys()|list)[0]}}" onclick="delt(this.id)">Delete</button>
+                                            <button type="button" class="more-menu-btn" role="menuitem" id="delete:{{(checkup.keys()|list)[0]}}"    onclick="delt(this.id)">Delete</button>
                                         </li>
                                     </ul>
                                 </div>
@@ -307,9 +308,7 @@
                     </div>
                   </div>
                 </div>
-
               </div>       
-
               {% endfor%}              
             {% endif%}
 
@@ -365,12 +364,15 @@
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        var response = this.responseText;
-        if (response != ""){
-          document.getElementById("panel").innerHTML += '<div class="more-features-box-text"> <div class="row"> <div class="col-sm-4"> <div class="more-features-box-text-icon"> <i class="fa fa-play" aria-hidden="true"></i> </div> <div class="more-features-box-text-description"> <h3>12345.</h3> <p>Unfilled</p> <button onclick="displayDetails()">details</button> </div> </div> <div class="col-sm-7"> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> <div class="count"> 50%; </div> </div> <div class="col-sm-1"> <i class="fas fa-ellipsis-v" style="padding-right: 15px;"></i> </div> </div> </div> ';
-        };
+        var id = this.responseText;
 
-        console.log(response);
+        if (id != ""){
+          document.getElementById("panel").innerHTML += '<div class="row" id="'+id+'"> <div class="more-features-box-text"> <div class="row"> <div class="col-sm-6"> <button onclick="analyze(this.id)" class="analyze" id="button:'+id+'"> <div class="more-features-box-text-icon"> <i class="fa fa-play" aria-hidden="true"></i> </div> </button> <div class="more-features-box-text-description"> <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal'+id+'">'+id.slice(1,id.length-2)+'</a></h3> <p class="status" id="status:'+id+'">Unfilled</p> </div> </div> <div class="col-sm-5"> <div class="countbox" id="countbox:'+id+'" data-user=""> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> </div> </div> <div class="col-sm-1"> <div> <div class="more" id="more:'+id+'"> <button id="more-btn" class="more-btn"> <i class="fas fa-ellipsis-v" style="padding-right: 15px;" aria-hidden="true"></i> </button> <div class="more-menu"> <div class="more-menu-caret"> <div class="more-menu-caret-outer"></div> <div class="more-menu-caret-inner"></div> </div> <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true"> <!-- <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Update Status</button> </li> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button> </li> --> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem" id="delete:'+id+'" onclick="delt(this.id)">Delete</button> </li> </ul> </div> </div> </div> </div> </div> </div> <!-- /form/'+id+' --> <div class="modal fade" id="TargetModal'+id+'" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel'+id+'" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h3 class="modal-title identifier" id="TargetModalLabel'+id+'" style="font-family: monospace;">'+id+'<a href="/form/'+id+'" style="padding-left: 20px;color: #0cb8b6"><i class="fa fa-external-link" aria-hidden="true"></i></a></h3> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div> <div class="modal-body"> <!-- Target --> <div class="modal-subtitle">Form URL<br></div> <input id="url'+id+'" value="https://127.0.0.1/form/'+id+'" class="url" readonly=""> <button class="btn" data-clipboard-target="#url'+id+'"> <i class="fa fa-copy" alt="Copy to clipboard" aria-hidden="true"></i> </button> </div> <div class="modal-body"> <div class="modal-subtitle">Unfilled Form<br></div> </div><div class="modal-body"> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" style="background-color: #0cb8b6;border:none;">Ok</button> </div> </div> </div> </div> </div>';
+        };
+        var url = window.location.hostname; 
+        try{document.getElementById(url+id).setAttribute("value","https:&#92;&#92;"+url+"/form/"+id);}
+        catch(err){console.log(err);console.log(document.getElementById(url+id))}
+        
       }
     };
     xhttp.open("GET", "/add", true);
@@ -405,16 +407,27 @@
         }
     }
 
-    try{
+  
+
+    var el_all = document.querySelectorAll('.more');
+    var btn_all = document.querySelectorAll('.more-btn');
+    var menu_all = document.querySelectorAll('.more-menu');
+
+    for (var i = el_all.length - 1; i >= 0; i--) {
+      
+
       // READMROE
-      var el = document.querySelector('.more');
-      var btn = el.querySelector('.more-btn');
-      var menu = el.querySelector('.more-menu');
+      var el = el_all[i];              
+      var btn = btn_all[i];
+      var menu = menu_all[i];
       var visible = false;
+      // console.log(el,btn,menu);
       btn.addEventListener('click', showMenu, false);
-    }catch(err){
-      console.log(err)
+      console.log(btn);
     }
+
+    
+  
   </script>
 
 
@@ -444,23 +457,31 @@
     }
 
     function delt(id){      
-      console.log(id);
-      var checkupid = id.split(":")[id.split(":").length-1];
-      console.log(checkupid);
-      document.getElementById(checkupid).style.visibility = 'hidden';   
+      
+      var checkupid = id.split(":")[id.split(":").length-1];          
       // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
-    
-      // var xhttp = new XMLHttpRequest();
-      // xhttp.onreadystatechange = function() {
-      //   if (this.readyState == 4 && this.status == 200) {
-      //     document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
-      //     document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
-      //     var response = this.responseText;
-      //     console.log(response);
-      //   }
-      // };
-      // xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
-      // xhttp.send();              
+   
+       var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var response = this.responseText;
+          console.log(response);
+          document.getElementById(checkupid).style.display = 'none';
+          Swal.fire(
+            'Success',
+            'Data Removed Succesfully',            
+            'success'
+          );
+        }else{
+          Swal.fire(
+            'Error',
+            'Internal server failiure, cant delete entry', 
+            'error'           
+          );
+        }
+      };
+      xhttp.open("DELETE", "/delete/"+checkupid, true);
+      xhttp.send();              
       
     }
 
