@@ -147,18 +147,18 @@
       <div class="row">
         <div class="col-lg-2 col-sm-4 col-xs-12">
           <div class="section-title">
-            <h2 class="head-title lg-line">Your Anonymous Checkups </h2>
+            <h2 class="head-title lg-line">Your Checkups </h2>
             <hr class="botm-line">
-            <p class="sec-para">Apply state of the art models that update real time to better enhance the data</p> 
+            <p class="sec-para">Anonymously apply state of the art models that update real time to better enhance the data</p> 
           </div>
         </div>
         <div class="col-lg-10 col-sm-8 col-xs-12">
           <div class="col-sm-12 more-features-box list" id="panel">
-            <!-- {{checkups}} -->
+            {{checkups}}
             {% if checkups|length > 0%}
               {% for checkup in checkups%}
-              <div class="row">
-                <div class="more-features-box-text" id="{{(checkup.keys()|list)[0]}}">
+              <div class="row" id="{{(checkup.keys()|list)[0]}}">
+                <div class="more-features-box-text" >
                   <div class="row">
                     <div class="col-sm-6">
                       <button onClick="analyze(this.id)" class="analyze" id="button:{{(checkup.keys()|list)[0]}}">
@@ -167,39 +167,60 @@
                         </div>
                       </button>
                       <div class="more-features-box-text-description">
-                        <h3 class="identifier"><a href="/form/{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}   </a></h3>
-                        <p class="status">Unfilled</p>
+                        <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}</a></h3>
+                        <p class="status" id="status:{{(checkup.keys()|list)[0]}}">{{checkup[(checkup.keys()|list)[0]]['status']}}</p>
                         
                         
                       </div>
                     </div>
                     <div class="col-sm-5" >
-                      <div class="countbox">
-                        <div class="count">
-                          50%;
-                        </div>
-                        <div class="count">
-                          50%;
-                        </div>
-                        <div class="count">
-                          50%;
-                        </div>
-                        <div class="count">
-                          50%;
-                        </div>
-                        <div class="count">
-                          50%;
-                        </div>
-                        <div class="count">
-                          50%;
-                        </div>
+                      <div class="countbox" id="countbox:{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['results']}}">
+                        {%if checkup[(checkup.keys()|list)[0]]['checked'] == 'checked'%}
+                          <div class="count">
+                            ...
+                          </div>
+                          <div class="count">
+                            ...
+                          </div>
+                          <div class="count">
+                            ...
+                          </div>
+                          <div class="count">
+                            ...
+                          </div>
+                          <div class="count">
+                            ...
+                          </div>
+                          <div class="count">
+                            ...
+                          </div>
+                        {% else %}
+                          <div class="count">
+                            
+                          </div>
+                          <div class="count">
+                            
+                          </div>
+                          <div class="count">
+                            
+                          </div>
+                          <div class="count">
+                            
+                          </div>
+                          <div class="count">
+                            
+                          </div>
+                          <div class="count">
+                            
+                          </div>                        
+                        {% endif %}
                       </div>
 
                     </div>
                     <div class="col-sm-1">      
 
 
-                        <div >
+                        <div>
                             <div class="more" id="more:{{(checkup.keys()|list)[0]}}">
                                 <button id="more-btn" class="more-btn">
                                     <i class="fas fa-ellipsis-v" style="padding-right: 15px;"></i>
@@ -211,14 +232,14 @@
                                         <div class="more-menu-caret-inner"></div>
                                     </div>
                                     <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true">
-                                        <li class="more-menu-item" role="presentation">
+<!--                                         <li class="more-menu-item" role="presentation">
                                             <button type="button" class="more-menu-btn" role="menuitem">Update Status</button>
                                         </li>
                                         <li class="more-menu-item" role="presentation">
                                             <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button>
-                                        </li>
+                                        </li> -->
                                         <li class="more-menu-item" role="presentation">
-                                            <button type="button" class="more-menu-btn" role="menuitem">Delete</button>
+                                            <button type="button" class="more-menu-btn" role="menuitem" id="delete:{{(checkup.keys()|list)[0]}}" onclick="delt(this.id)">Delete</button>
                                         </li>
                                     </ul>
                                 </div>
@@ -228,8 +249,67 @@
                       
                     </div>
                   </div>
-                </div>       
+                </div>      
+
+                <!-- /form/{{(checkup.keys()|list)[0]}} -->
+                <div class="modal fade" id="TargetModal{{(checkup.keys()|list)[0]}}" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel{{(checkup.keys()|list)[0]}}" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3 class="modal-title identifier" id="TargetModalLabel{{(checkup.keys()|list)[0]}}" style="font-family: monospace;">{{(checkup.keys()|list)[0]}}<a href="/form/{{(checkup.keys()|list)[0]}}" style="padding-left: 20px;color: #0cb8b6"><i class="fa fa-external-link"></i></a></h3>
+
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <!-- Target -->
+                        <div class="modal-subtitle">Form URL<br></div>
+                        <input id="url{{(checkup.keys()|list)[0]}}" value="" class="url" readonly>
+                        <script type="text/javascript">
+                          var url = window.location.hostname;                    
+                          document.getElementById("url{{(checkup.keys()|list)[0]}}").setAttribute("value",'https://'+url+'/form/{{(checkup.keys()|list)[0]}}');
+
+                        </script>
+                        <!-- Trigger -->
+                        <button class="btn" data-clipboard-target="#url{{(checkup.keys()|list)[0]}}">
+                            <i class="fa fa-copy" alt="Copy to clipboard"></i>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        
+                        {% if checkup[(checkup.keys()|list)[0]]['contents']|length > 0%}
+                          <div class="modal-subtitle" >Form Contents<br></div>
+                          <span id="contents{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['contents']}}"></span>
+                        {% else%}
+                          <div class="modal-subtitle" >Unfilled Form<br></div>
+                        {% endif %}
+                      </div>
+                      <!-- 
+                      <div class="modal-body">
+                        <div class="modal-subtitle">AI Results<br></div>
+                        <span id="results{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['results']}}"></span>
+                      </div>                                             -->
+                      <div class="modal-body">
+                        {% if checkup[(checkup.keys()|list)[0]]['contents']|length > 0%}
+                          <div class="modal-subtitle">Run AI<br></div>
+                          <button onClick="analyze(this.id)" class="analyze" id="modalbutton:{{(checkup.keys()|list)[0]}}">
+                            <div class="more-features-box-text-icon">
+                              <i class="fa fa-play" aria-hidden="true"></i>
+                            </div>
+                          </button>                        
+                        {% endif %}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" style="background-color: #0cb8b6;border:none;">Ok</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>       
+
               {% endfor%}              
             {% endif%}
 
@@ -264,8 +344,7 @@
   <!--footer-->
   <footer id="footer" style="bottom: 0;
     position: fixed;
-    width: 100%;
-}">
+    width: 100%;}">
     <div class="footer-line">
       <div class="container">
         <div class="row">
@@ -280,6 +359,7 @@
   </footer>
   <!--/ footer-->
   
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script>
   <script type="text/javascript">
   function createForm() {
     var xhttp = new XMLHttpRequest();
@@ -345,27 +425,136 @@
       document.getElementById(id).firstElementChild.innerHTML = '<div class="loading-pulse"></div>';
       var checkupid = id.split(":")[id.split(":").length-1]      
       // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
-      
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
-          document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
-          var response = this.responseText;
-          console.log(response);
-        }
-      };
-      xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
-      xhttp.send();      
+      if (document.getElementById("status:"+checkupid).innerHTML == 'Filled'){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
+            document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
+            var response = this.responseText;
+            console.log(response);
+          }
+        };
+        xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
+        xhttp.send();              
+      }else{
+        document.getElementById(id).firstElementChild.style.backgroundColor = "#5d0000";
+        document.getElementById(id).firstElementChild.innerHTML = '<div class="fa fa-close"></div>';        
+      }    
     }
-    function heatMapColorforValue(value){
-      var h = (1.0 - value) * 240
-      return "hsl(" + h + ", 100%, 50%)";
-    }
-    function heatDetection(){
-      var panel = document.getElementById("panel")
 
+    function delt(id){      
+      console.log(id);
+      var checkupid = id.split(":")[id.split(":").length-1];
+      console.log(checkupid);
+      document.getElementById(checkupid).style.visibility = 'hidden';   
+      // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
+    
+      // var xhttp = new XMLHttpRequest();
+      // xhttp.onreadystatechange = function() {
+      //   if (this.readyState == 4 && this.status == 200) {
+      //     document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
+      //     document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
+      //     var response = this.responseText;
+      //     console.log(response);
+      //   }
+      // };
+      // xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
+      // xhttp.send();              
+      
     }
+
+
+    function ClientRender(){
+      function heatMapColorforValue(value){
+        var h = (1.0 - value) * 230
+        return "hsl(" + h + ", 96%, 46%)";
+      }
+      function heatMapBackgroundforValue(value){
+        var h = (1.0 - value) * 240
+        return "hsl(" + h + ", 100%, 50%,0.3)";
+      }
+
+      function loadHeatDetections(selectedId){
+        // the small boxes on the screen
+        var countbox = document.getElementById(selectedId).children;
+        // the data thats embeded from jinja2
+        var data = document.getElementById(selectedId).getAttribute("data-user"); 
+        // this is the list of parsed from the embed
+        var detect_list = data.matchAll(/\[(.*?)\]/g);        
+        var detections = [];
+        for (const element of detect_list) {
+          detections.push(element[1]);
+        }
+        console.log(detections);
+        if (detections.length > 0){  
+          for (var i = countbox.length - 1; i >= 0; i--) {
+            var number = detections[i].slice(0,2);
+            countbox[i].innerHTML = number + "%";          
+            countbox[i].style.backgroundColor = heatMapBackgroundforValue(number/100);
+            countbox[i].style.color = heatMapColorforValue(number/100);                
+          }
+        }
+      }
+      function loadModalData(selectedId){
+        //This function dinamically loads from the jinja embeded data some divs that make the form preview look awesome, pretty much the predefine data
+
+        // the small boxes on the screen
+        var target = document.getElementById(selectedId);
+        // the data thats embeded from jinja2
+          
+        try{
+          var unparsed = target.getAttribute("data-user");        
+          if (unparsed != ''){
+            var data = JSON.parse(unparsed.replaceAll("'",'"'));             
+            for (var key in data){
+                var attrName = key;
+                var attrValue = data[key];
+                target.innerHTML += '<div class="modal_data_container"><span class="modal_data_span">'+attrName+'</span>'+'<input value="'+attrValue+'" class="modal_data" readonly></div>';
+
+            }          
+          } 
+        }catch(err){
+          console.log(err)
+        }
+
+      }
+      function loadResultData(selectedId){
+        //this function should make even prettier the given detections
+
+        // the small boxes on the screen
+        var target = document.getElementById(selectedId);
+        // the data thats embeded from jinja2
+        var data = document.getElementById(selectedId).getAttribute("data-user").replaceAll("'",'"'); 
+
+        // this is the list of parsed from the embed
+        var detect_list = data.matchAll(/\[(.*?)\]/g);        
+        var detections = [];
+        for (const element of detect_list) {
+          detections.push(element[1]);
+        }// console.log(detections)
+        if (detections.length > 0){  
+          for (var i = detections.length - 1; i >= 0; i--) {
+            var number = detections[i].slice(0,2);
+            console.log(number);
+          }
+        }
+      }
+
+      
+      var panel = document.getElementById("panel").children;
+      for (var i = panel.length - 1; i >= 0; i--) {
+        // Iterates over every post in the panel
+        var selected = panel[i];
+        var selectedId =  selected.getAttribute("id");
+        loadHeatDetections("countbox:"+selectedId);         
+        loadModalData("contents"+selectedId);
+        // loadResultData("results"+selectedId);
+      }
+      // for each element in the detection box, if there is one creates the colored percentage in the quickview and the modal
+    }
+    new ClipboardJS('.btn');
+    ClientRender();
   </script>
 
 
@@ -375,6 +564,8 @@
   <script src="static/js/bootstrap.min.js"></script>
   <script src="static/js/custom.js"></script>
   <script src="static/contactform/contactform.js"></script>
+  
+
 </body>
 
 </html>

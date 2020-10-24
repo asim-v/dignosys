@@ -286,10 +286,10 @@ def form(id):
 
 
                         val = db.update({'_id' : ObjectId(u["_id"])}, {'$set' : {'checkups' : checkup_list }})
-                        return render_template('form.html')
+                        return render_template('form.html',success=True)
                     else:
                         # return jsonify(str(entry))
-                        return render_template('form.html',data=str(entry))
+                        return render_template('form.html',data=entry)
 
 
         # return jsonify(process_user_data(data))
@@ -308,12 +308,13 @@ def analyze(id):
         checkup_list = u["checkups"]
         for i,element in enumerate(u["checkups"]):
             try:
-                if list(element.keys())[0] == id:                                
-                    checkup_list[i][id]['results'] = str(process_user_data(data))
+                if list(element.keys())[0] == id:        
+                    results = str(process_user_data(data))
+                    checkup_list[i][id]['results'] = results
                     checkup_list[i][id]['checked'] = 'checked'
                     # return jsonify(str(checkup_list))
                     val = db.update({'_id' : ObjectId(session['id'])}, {'$set' : {'checkups' : checkup_list}})
-                    return jsonify(str(val))
+                    return jsonify(results)
             except Exception as e:
                 return jsonify(str(e))
 
@@ -321,7 +322,10 @@ def analyze(id):
         # update.append(form_object)
         
     
-    
+@app.route('/delete/<id>')
+def delete(id):
+    return jsonify('OK')
+
 
 @app.route('/add')
 def add_checkup():
@@ -456,7 +460,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -466,7 +470,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -476,7 +480,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -486,7 +490,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -496,7 +500,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -506,7 +510,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -516,7 +520,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -526,7 +530,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -536,7 +540,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -546,7 +550,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -556,7 +560,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -566,7 +570,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -576,7 +580,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -586,7 +590,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -596,7 +600,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -606,7 +610,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -616,7 +620,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -626,7 +630,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -636,7 +640,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -646,7 +650,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -656,7 +660,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -666,7 +670,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -676,7 +680,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -686,7 +690,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -696,7 +700,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -706,7 +710,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -716,7 +720,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -726,7 +730,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[2]*100,
@@ -736,7 +740,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 1) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[2]*100,
@@ -746,7 +750,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -756,7 +760,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -766,7 +770,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -776,7 +780,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -786,7 +790,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -796,7 +800,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -806,7 +810,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -816,7 +820,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -826,7 +830,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -836,7 +840,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -846,7 +850,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -856,7 +860,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -866,7 +870,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -876,7 +880,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -886,7 +890,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }   
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -896,7 +900,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 1) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -906,7 +910,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -916,7 +920,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -926,7 +930,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -936,7 +940,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -946,7 +950,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -956,7 +960,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -966,7 +970,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -976,7 +980,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 1) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -986,7 +990,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -996,7 +1000,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1006,7 +1010,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1016,7 +1020,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 1) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1026,7 +1030,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1036,7 +1040,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy) 
+        return prob 
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 1) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1046,7 +1050,7 @@ def process_user_data(data):
         "prob_5" : val5[2]*100, 
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 1)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1056,7 +1060,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[1]*100
     }
-        return (data, prob, accuracy)
+        return prob
     elif((val[0] == 0) and (val2[0] == 0) and (val3[0] == 0) and (val4[0] == 0) and (val5[0] == 0) and (fin_model[0] == 0)):
         prob = {
         "prob_1" : val[3]*100,
@@ -1066,7 +1070,7 @@ def process_user_data(data):
         "prob_5" : val5[3]*100,
         "v_prob" : fin_model[2]*100
     }
-        return (data, prob, accuracy)
+        return prob
 
     return jsonify(data)
     

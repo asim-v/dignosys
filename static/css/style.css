@@ -64,8 +64,8 @@ banner
 
 .count{
     display: inline-flex;
-    background-color: #ff00002b;
-    color: #ff3b3b;
+    color: gray
+    background-color:lightgray;    
     padding: 1%;
     padding-left: 2%;
     padding-right: 2%;
@@ -73,9 +73,31 @@ banner
     font-weight: 600;
 }
 .countbox{
+
     position: absolute;
     right: 0;
     min-width: 350px;
+}
+.url {
+    border:none;
+    background-color: #a3ff001a;
+    color: #95d41b;
+    width: 90%;
+    padding: 6px 12px;
+}.modal_data{
+    border: none;
+    background-color: #bdb8b81a;
+    color: #848680;
+    padding: 10px 10px;
+    width: 122px;    
+    padding: 6px 12px;
+    
+}.modal_data_container{
+    display: inline-grid;
+    margin: 10px;
+    width: 150px;
+}.modal_data_span{
+    width: 28px
 }
 @media only screen and (max-width: 1200px){
     .countbox{
@@ -126,6 +148,7 @@ banner
     .more-features-box-text{
         height: 100px;
     }
+    
     .more-features-box-text-description{
         margin-left: 50px !important;
     }

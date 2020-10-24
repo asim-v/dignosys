@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  {% if data %}
+  {% if data|length > 0 %}
   	<meta name="json" content="{{data[(data.keys()|list)[0]]['contents']}}">
   {% endif %}
   
@@ -23,6 +23,12 @@
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
   <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/style.css')}}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!-- For the tooltip -->
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>  
+
   <script>
     var preloader = document.getElementById('preloader')
     // window.onload = () => {
@@ -147,118 +153,118 @@
 	            <p class="sec-para">Upload anonymously to the blockchain your information so that your doctor utilize state of the art detcetion systems to diagnose possible risk factors</p> 
 	          </div>
 	        </div>
-			<div class="col-md-8">
+			<div class="col-lg-8">
 				<form method="POST" action="" id="form">
 
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="age" placeholder="Age in years" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
+						<!-- <div class="col-xs-1">
 							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
-						</div>
+						</div> -->
 					</div>
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="sex" placeholder="(1 = male; 0 = female)" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
+						<!-- <div class="col-xs-1">
 							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
-						</div>
+						</div> -->
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="cp" placeholder="Chest Pain Type" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a  data-toggle="tooltip" title="1: Typical angina. 2: Atypical angina. 3: Non-anginal pain. 4: Asymptomatic"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="trestbps" placeholder="Resting blood pressure (in mm Hg on admission to the hospital)" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.nhs.uk/common-health-questions/lifestyle/what-is-blood-pressure/#:~:text=As%20a%20general%20guide%3A,be%2090%2F60mmHg%20or%20lower"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="chol" placeholder="Serum cholestoral in mg/dl" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.healthline.com/health/serum-cholesterol"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="fbs" placeholder="(fasting blood sugar &gt; 120 mg/dl) (1 = true; 0 = false)" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.medicalnewstoday.com/articles/317466"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="restecg" placeholder="Resting electrocardiographic results" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://accessmedicine.mhmedical.com/content.aspx?bookid=1872&sectionid=146977936"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="thalach" placeholder="Maximum heart rate achieved" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/exercise-intensity/art-20046887#:~:text=You%20can%20calculate%20your%20maximum,beat%20per%20minute%20during%20exercise."><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="exang" placeholder="Exercise induced angina (1 = yes; 0 = no)" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.mayoclinic.org/diseases-conditions/angina/symptoms-causes/syc-20369373#:~:text=But%20when%20you%20increase%20the,arteries%20slow%20down%20blood%20flow."><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="oldpeak" placeholder="ST depression induced by exercise relative to rest" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://link.springer.com/article/10.1007/s10554-004-2458-y"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="slope" placeholder="The slope of the peak exercise ST segment" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1123032/#:~:text=The%20J%20point%20(the%20point,exercise%20therefore%20slopes%20sharply%20upwards."><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
+						<div class="col-xs-10">
 							<input name="ca" placeholder="Number of major vessels (0-3) colored by flourosopy" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.wikiwand.com/en/Fluoroscopy"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
-							<input name="thal" placeholder="3 = normal; 6 = fixed defect; 7 = reversable defect" value="" type="text" autofocus class="form-control"><br>
+						<div class="col-xs-10">
+							<input name="thal" placeholder="Thallium Scan  3 = normal; 6 = fixed defect; 7 = reversable defect" value="" type="text" autofocus class="form-control"><br>
 						</div>
-						<div class="col-sm-1">
-							<div class="row"><a href=""><i class="fa fa-question"></i></a></div>
+						<div class="col-xs-1">
+							<div class="row"><a href="https://www.heartandstroke.ca/heart-disease/tests/thallium-or-cardiolite-scan#:~:text=A%20thallium%20(or%20cardiolite)%20scan,thallium%20myocardial%20imaging"><i class="fa fa-question"></i></a></div>
 						</div>
 					</div>					
 					<div class="row">
-						<div class="col-sm-11">
-							<button onclick="validate()" type="submit" href="/update" class="btn btn-primary green " id="save_button">Submit</button>
+						<div class="col-xs-10">
+							<button type="submit" href="/update" class="btn btn-primary green " id="save_button">Submit</button>
 						</div>				
-						<div class="col-sm-1">	
+						<div class="col-xs-1">	
 						</div>
 					</div>						
 				</form>
@@ -288,6 +294,19 @@
 
 <script type="text/javascript">
 		
+	function validate(){
+		// simply animates the sent 
+		Swal.fire(
+          'Data Saved',
+          'Success',
+          'Success'
+        );
+    }
+
+    {%if success %}
+    	validate();
+    {%endif%}
+
 	function connect_to_backend(){
 		try{
 			var url = window.location.pathname.split("/");
@@ -319,6 +338,11 @@
 	prefill();
 	
 
+</script>
+<script>
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();   
+});
 </script>
   <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
   <script src="static/js/jquery.min.js"></script>
