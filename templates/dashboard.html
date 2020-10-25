@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dignosys Dashboard</title>
 
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
   <script src="https://kit.fontawesome.com/041275e51b.js" crossorigin="anonymous"></script>
   <script src="../static/js/sweetalert2.all.min.js"></script>
   <link rel="stylesheet" href="../static/css/sweetalert2.min.css">
@@ -93,7 +95,7 @@
   }
   .identifier a{
     font-family: monospace;
-    color: #396e7f !important;
+    color: #055252 !important;
     text-decoration: none !important;
   }
   @media (max-width: 600px){
@@ -154,29 +156,30 @@
         </div>
         <div class="col-lg-10 col-sm-8 col-xs-12">
           <div class="col-sm-12 more-features-box list" id="panel">
-
-            {{checkups}}
+            <!-- debug -->
+            <!-- {{checkups}} -->
             {% if checkups|length > 0%}
               {% for checkup in checkups%}
-              <div class="row" id="{{(checkup.keys()|list)[0]}}" class="compress">
+              {% set id = (checkup.keys()|list)[0]%}
+              <div class="row" id="{{id}}" class="compress">
                 <div class="more-features-box-text" >
                   <div class="row">
                     <div class="col-sm-6">
-                      <button onClick="analyze(this.id)" class="analyze" id="button:{{(checkup.keys()|list)[0]}}">
+                      <button onClick="analyze(this.id)" class="analyze" id="button:{{id}}">
                         <div class="more-features-box-text-icon">
                           <i class="fa fa-play" aria-hidden="true"></i>
                         </div>
                       </button>
                       <div class="more-features-box-text-description">
-                        <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal{{(checkup.keys()|list)[0]}}">{{(checkup.keys()|list)[0]}}</a></h3>
-                        <p class="status" id="status:{{(checkup.keys()|list)[0]}}">{{checkup[(checkup.keys()|list)[0]]['status']}}</p>
+                        <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal{{id}}">{{id}}</a></h3>
+                        <p class="status {{checkup[id]['status']}}" id="status:{{id}}">{{checkup[id]['status']}}</p>
                         
                         
                       </div>
                     </div>
                     <div class="col-sm-5" >
-                      <div class="countbox" id="countbox:{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['results']}}">
-                        {%if checkup[(checkup.keys()|list)[0]]['checked'] == 'checked'%}
+                      <div class="countbox" id="countbox:{{id}}" data-user="{{checkup[id]['results']}}">
+                        {%if checkup[id]['checked'] == 'checked'%}
                           <div class="count">
                             ...
                           </div>
@@ -222,25 +225,19 @@
 
 
                         <div>
-                            <div class="more" id="more:{{(checkup.keys()|list)[0]}}">
-                                <button id="more-btn" class="more-btn">
+                            <div class="more" id="more:{{id}}">
+                                <button  class="more-btn" id="more-btn:{{id}}" onclick="toggleMenu(this.id)">
                                     <i class="fas fa-ellipsis-v" style="padding-right: 15px;"></i>
 
                                 </button>
-                                <div class="more-menu">
+                                <div class="more-menu" id="more-menu:{{id}}">
                                     <div class="more-menu-caret">
                                         <div class="more-menu-caret-outer"></div>
                                         <div class="more-menu-caret-inner"></div>
                                     </div>
                                     <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true">
-                                        <!-- <li class="more-menu-item" role="presentation">
-                                            <button type="button" class="more-menu-btn" role="menuitem">Update Status</button>
-                                        </li>
                                         <li class="more-menu-item" role="presentation">
-                                            <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button>
-                                        </li> -->
-                                        <li class="more-menu-item" role="presentation">
-                                            <button type="button" class="more-menu-btn" role="menuitem" id="delete:{{(checkup.keys()|list)[0]}}"    onclick="delt(this.id)">Delete</button>
+                                            <button type="button" class="more-menu-btn" role="menuitem" id="delete:{{id}}"    onclick="del(this.id)">Delete</button>
                                         </li>
                                     </ul>
                                 </div>
@@ -252,12 +249,12 @@
                   </div>
                 </div>      
 
-                <!-- /form/{{(checkup.keys()|list)[0]}} -->
-                <div class="modal fade" id="TargetModal{{(checkup.keys()|list)[0]}}" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel{{(checkup.keys()|list)[0]}}" aria-hidden="true">
+                <!-- /form/{{id}} -->
+                <div class="modal fade" id="TargetModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel{{id}}" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h3 class="modal-title identifier" id="TargetModalLabel{{(checkup.keys()|list)[0]}}" style="font-family: monospace;">{{(checkup.keys()|list)[0]}}<a href="/form/{{(checkup.keys()|list)[0]}}" style="padding-left: 20px;color: #0cb8b6"><i class="fa fa-external-link"></i></a></h3>
+                        <h3 class="modal-title identifier" id="TargetModalLabel{{id}}" style="font-family: monospace;">{{id}}<a href="/form/{{id}}" style="padding-left: 20px;color: #0cb8b6" target="_blank"><i class="fa fa-external-link"></i></a></h3>
 
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
@@ -266,22 +263,22 @@
                       <div class="modal-body">
                         <!-- Target -->
                         <div class="modal-subtitle">Form URL<br></div>
-                        <input id="url{{(checkup.keys()|list)[0]}}" value="" class="url" readonly>
+                        <input id="url{{id}}" value="" class="url" readonly>
                         <script type="text/javascript">
                           var url = window.location.hostname;                    
-                          document.getElementById("url{{(checkup.keys()|list)[0]}}").setAttribute("value",'https://'+url+'/form/{{(checkup.keys()|list)[0]}}');
+                          document.getElementById("url{{id}}").setAttribute("value",'https://'+url+'/form/{{id}}');
 
                         </script>
                         <!-- Trigger -->
-                        <button class="btn" data-clipboard-target="#url{{(checkup.keys()|list)[0]}}">
+                        <button class="btn" data-clipboard-target="#url{{id}}">
                             <i class="fa fa-copy" alt="Copy to clipboard"></i>
                         </button>
                       </div>
                       <div class="modal-body">
                         
-                        {% if checkup[(checkup.keys()|list)[0]]['contents']|length > 0%}
+                        {% if checkup[id]['contents']|length > 0%}
                           <div class="modal-subtitle" >Form Contents<br></div>
-                          <span id="contents{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['contents']}}"></span>
+                          <span id="contents{{id}}" data-user="{{checkup[id]['contents']}}"></span>
                         {% else%}
                           <div class="modal-subtitle" >Unfilled Form<br></div>
                         {% endif %}
@@ -289,12 +286,12 @@
                       <!-- 
                       <div class="modal-body">
                         <div class="modal-subtitle">AI Results<br></div>
-                        <span id="results{{(checkup.keys()|list)[0]}}" data-user="{{checkup[(checkup.keys()|list)[0]]['results']}}"></span>
+                        <span id="results{{id}}" data-user="{{checkup[id]['results']}}"></span>
                       </div>                                             -->
                       <div class="modal-body">
-                        {% if checkup[(checkup.keys()|list)[0]]['contents']|length > 0%}
+                        {% if checkup[id]['contents']|length > 0%}
                           <div class="modal-subtitle">Run AI<br></div>
-                          <button onClick="analyze(this.id)" class="analyze" id="modalbutton:{{(checkup.keys()|list)[0]}}">
+                          <button onClick="analyze(this.id)" class="analyze" id="modalbutton:{{id}}">
                             <div class="more-features-box-text-icon">
                               <i class="fa fa-play" aria-hidden="true"></i>
                             </div>
@@ -367,7 +364,7 @@
         var id = this.responseText;
 
         if (id != ""){
-          document.getElementById("panel").innerHTML += '<div class="row" id="'+id+'"> <div class="more-features-box-text"> <div class="row"> <div class="col-sm-6"> <button onclick="analyze(this.id)" class="analyze" id="button:'+id+'"> <div class="more-features-box-text-icon"> <i class="fa fa-play" aria-hidden="true"></i> </div> </button> <div class="more-features-box-text-description"> <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal'+id+'">'+id.slice(1,id.length-2)+'</a></h3> <p class="status" id="status:'+id+'">Unfilled</p> </div> </div> <div class="col-sm-5"> <div class="countbox" id="countbox:'+id+'" data-user=""> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> </div> </div> <div class="col-sm-1"> <div> <div class="more" id="more:'+id+'"> <button id="more-btn" class="more-btn"> <i class="fas fa-ellipsis-v" style="padding-right: 15px;" aria-hidden="true"></i> </button> <div class="more-menu"> <div class="more-menu-caret"> <div class="more-menu-caret-outer"></div> <div class="more-menu-caret-inner"></div> </div> <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true"> <!-- <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Update Status</button> </li> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button> </li> --> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem" id="delete:'+id+'" onclick="delt(this.id)">Delete</button> </li> </ul> </div> </div> </div> </div> </div> </div> <!-- /form/'+id+' --> <div class="modal fade" id="TargetModal'+id+'" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel'+id+'" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h3 class="modal-title identifier" id="TargetModalLabel'+id+'" style="font-family: monospace;">'+id+'<a href="/form/'+id+'" style="padding-left: 20px;color: #0cb8b6"><i class="fa fa-external-link" aria-hidden="true"></i></a></h3> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div> <div class="modal-body"> <!-- Target --> <div class="modal-subtitle">Form URL<br></div> <input id="url'+id+'" value="https://127.0.0.1/form/'+id+'" class="url" readonly=""> <button class="btn" data-clipboard-target="#url'+id+'"> <i class="fa fa-copy" alt="Copy to clipboard" aria-hidden="true"></i> </button> </div> <div class="modal-body"> <div class="modal-subtitle">Unfilled Form<br></div> </div><div class="modal-body"> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" style="background-color: #0cb8b6;border:none;">Ok</button> </div> </div> </div> </div> </div>';
+          document.getElementById("panel").innerHTML += '<div class="row" id="'+id+'"> <div class="more-features-box-text"> <div class="row"> <div class="col-sm-6"> <button onclick="analyze(this.id)" class="analyze" id="button:'+id+'"> <div class="more-features-box-text-icon"> <i class="fa fa-play" aria-hidden="true"></i> </div> </button> <div class="more-features-box-text-description"> <h3 class="identifier"><a href="" data-toggle="modal" data-target="#TargetModal'+id+'">'+id.slice(1,id.length-2)+'</a></h3> <p class="status" id="status:'+id+'">Unfilled</p> </div> </div> <div class="col-sm-5"> <div class="countbox" id="countbox:'+id+'" data-user=""> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> <div class="count"> </div> </div> </div> <div class="col-sm-1"> <div> <div class="more" id="more:'+id+'"> <button id="more-btn" class="more-btn"> <i class="fas fa-ellipsis-v" style="padding-right: 15px;" aria-hidden="true"></i> </button> <div class="more-menu"> <div class="more-menu-caret"> <div class="more-menu-caret-outer"></div> <div class="more-menu-caret-inner"></div> </div> <ul class="more-menu-items" tabindex="-1" role="menu" aria-labelledby="more-btn" aria-hidden="true"> <!-- <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Update Status</button> </li> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem">Edit Incident</button> </li> --> <li class="more-menu-item" role="presentation"> <button type="button" class="more-menu-btn" role="menuitem" id="delete:'+id+'" onclick="del(this.id)">Delete</button> </li> </ul> </div> </div> </div> </div> </div> </div> <!-- /form/'+id+' --> <div class="modal fade" id="TargetModal'+id+'" tabindex="-1" role="dialog" aria-labelledby="TargetModalLabel'+id+'" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h3 class="modal-title identifier" id="TargetModalLabel'+id+'" style="font-family: monospace;">'+id+'<a href="/form/'+id+'" style="padding-left: 20px;color: #0cb8b6"><i class="fa fa-external-link" aria-hidden="true"></i></a></h3> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div> <div class="modal-body"> <!-- Target --> <div class="modal-subtitle">Form URL<br></div> <input id="url'+id+'" value="https://127.0.0.1/form/'+id+'" class="url" readonly=""> <button class="btn" data-clipboard-target="#url'+id+'"> <i class="fa fa-copy" alt="Copy to clipboard" aria-hidden="true"></i> </button> </div> <div class="modal-body"> <div class="modal-subtitle">Unfilled Form<br></div> </div><div class="modal-body"> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" style="background-color: #0cb8b6;border:none;">Ok</button> </div> </div> </div> </div> </div>';
         };
         var url = window.location.hostname; 
         try{document.getElementById(url+id).setAttribute("value","https:&#92;&#92;"+url+"/form/"+id);}
@@ -383,17 +380,25 @@
   
   <script type="text/javascript">
 
-    function showMenu(e) {
-        e.preventDefault();
-        if (!visible) {
-            visible = true;
-            el.classList.add('show-more-menu');
-            menu.setAttribute('aria-hidden', false);
-            menu.setAttribute('z-index',100);
-            document.addEventListener('mousedown', hideMenu, false);
+    function toggleMenu(id){      
+      var checkupid = id.split(":")[id.split(":").length-1]            
+      var pointed = document.getElementById("more:"+checkupid);
+      var menu = document.getElementById("more-menu:"+checkupid);
+      
+      if(pointed.classList.contains('show-more-menu')){        
+        pointed.classList.remove('show-more-menu');        
+        menu.setAttribute('aria-hidden', true);      
+        menu.style.pointerEvents = 'none';      
 
-        }
+      }else{
+        pointed.classList.add('show-more-menu');        
+        menu.setAttribute('aria-hidden', false);
+        menu.setAttribute('z-index',100);
+        menu.style.pointerEvents = 'all';      
+        
+      }
     }
+
 
     function hideMenu(e) {
         if (btn.contains(e.target)) {
@@ -403,38 +408,118 @@
             visible = false;
             el.classList.remove('show-more-menu');
             menu.setAttribute('aria-hidden', true);
+            menu.style.pointerEvents = 'none';
+
             document.removeEventListener('mousedown', hideMenu);
+
         }
     }
 
   
 
-    var el_all = document.querySelectorAll('.more');
-    var btn_all = document.querySelectorAll('.more-btn');
-    var menu_all = document.querySelectorAll('.more-menu');
-
-    for (var i = el_all.length - 1; i >= 0; i--) {
-      
-
-      // READMROE
-      var el = el_all[i];              
-      var btn = btn_all[i];
-      var menu = menu_all[i];
-      var visible = false;
-      // console.log(el,btn,menu);
-      btn.addEventListener('click', showMenu, false);
-      console.log(btn);
-    }
-
-    
   
   </script>
 
 
 
   <script type="text/javascript">
+
+    function heatMapColorforValue(value){
+      var h = (1.0 - value) * 230
+      return "hsl(" + h + ", 96%, 46%)";
+    }
+
+    function heatMapBackgroundforValue(value){
+      var h = (1.0 - value) * 240
+      return "hsl(" + h + ", 100%, 50%,0.3)";
+    }
+
+    function loadHeatDetections(selectedId,data=0){
+      // the small boxes on the screen
+      var countbox = document.getElementById(selectedId).children;
+      // the data thats embeded from jinja2
+      if(data == 0){
+        // this is the list of parsed from the embed or the passed in 
+        var data = document.getElementById(selectedId).getAttribute("data-user");           
+      }
+
+      var detect_list = data.matchAll(/\[(.*?)\]/g);        
+      var detections = [];
+      for (const element of detect_list) {
+        detections.push(element[1]);
+      }
+      console.log(detections);
+      if (detections.length > 0){  
+        for (var i = countbox.length - 1; i >= 0; i--) {
+          var number = detections[i].slice(0,2);
+          countbox[i].innerHTML = number + "%";          
+          countbox[i].style.backgroundColor = heatMapBackgroundforValue(number/100);
+          countbox[i].style.color = heatMapColorforValue(number/100);                
+        }
+      } 
+
+    }
+    function loadModalData(selectedId){
+      //This function dinamically loads from the jinja embeded data some divs that make the form preview look awesome, pretty much the predefine data
+
+      // the small boxes on the screen
+      var target = document.getElementById(selectedId);
+      // the data thats embeded from jinja2
+        
+      try{
+        var unparsed = target.getAttribute("data-user");        
+        if (unparsed != ''){
+          var data = JSON.parse(unparsed.replaceAll("'",'"'));             
+          for (var key in data){
+              var attrName = key;
+              var attrValue = data[key];
+              target.innerHTML += '<div class="modal_data_container"><span class="modal_data_span">'+attrName+'</span>'+'<input value="'+attrValue+'" class="modal_data" readonly></div>';
+
+          }          
+        } 
+      }catch(err){
+        console.log(err)
+      }
+
+    }
+    function loadResultData(selectedId){
+      //this function should make even prettier the given detections
+
+      // the small boxes on the screen
+      var target = document.getElementById(selectedId);
+      // the data thats embeded from jinja2
+      var data = document.getElementById(selectedId).getAttribute("data-user").replaceAll("'",'"'); 
+
+      // this is the list of parsed from the embed
+      var detect_list = data.matchAll(/\[(.*?)\]/g);        
+      var detections = [];
+      for (const element of detect_list) {
+        detections.push(element[1]);
+      }// console.log(detections)
+      if (detections.length > 0){  
+        for (var i = detections.length - 1; i >= 0; i--) {
+          var number = detections[i].slice(0,2);
+          console.log(number);
+        }
+      }
+    }
+
+
+    function ClientRender(){      
+      var panel = document.getElementById("panel").children;
+      for (var i = panel.length - 1; i >= 0; i--) {
+        // Iterates over every post in the panel
+        var selected = panel[i];
+        var selectedId =  selected.getAttribute("id");
+        loadHeatDetections("countbox:"+selectedId);         
+        loadModalData("contents"+selectedId);
+        // loadResultData("results"+selectedId);
+      }
+      // for each element in the detection box, if there is one creates the colored percentage in the quickview and the modal
+    }
+
     function analyze(id){
-      document.getElementById(id).firstElementChild.style.backgroundColor = "#005d5c";
+      document.getElementById(id).firstElementChild.style.backgroundColor = "#077978";
       document.getElementById(id).firstElementChild.innerHTML = '<div class="loading-pulse"></div>';
       var checkupid = id.split(":")[id.split(":").length-1]      
       // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
@@ -445,7 +530,8 @@
             document.getElementById(id).firstElementChild.style.backgroundColor = "#32ddae";
             document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
             var response = this.responseText;
-            console.log(response);
+            // console.log(response);
+            loadHeatDetections(response);
           }
         };
         xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
@@ -456,7 +542,7 @@
       }    
     }
 
-    function delt(id){      
+    function del(id){      
       
       var checkupid = id.split(":")[id.split(":").length-1];          
       // since the id gets passed from the button, this simply removes the button:header of the id to be sent to the http
@@ -486,94 +572,7 @@
     }
 
 
-    function ClientRender(){
-      function heatMapColorforValue(value){
-        var h = (1.0 - value) * 230
-        return "hsl(" + h + ", 96%, 46%)";
-      }
-      function heatMapBackgroundforValue(value){
-        var h = (1.0 - value) * 240
-        return "hsl(" + h + ", 100%, 50%,0.3)";
-      }
 
-      function loadHeatDetections(selectedId){
-        // the small boxes on the screen
-        var countbox = document.getElementById(selectedId).children;
-        // the data thats embeded from jinja2
-        var data = document.getElementById(selectedId).getAttribute("data-user"); 
-        // this is the list of parsed from the embed
-        var detect_list = data.matchAll(/\[(.*?)\]/g);        
-        var detections = [];
-        for (const element of detect_list) {
-          detections.push(element[1]);
-        }
-        console.log(detections);
-        if (detections.length > 0){  
-          for (var i = countbox.length - 1; i >= 0; i--) {
-            var number = detections[i].slice(0,2);
-            countbox[i].innerHTML = number + "%";          
-            countbox[i].style.backgroundColor = heatMapBackgroundforValue(number/100);
-            countbox[i].style.color = heatMapColorforValue(number/100);                
-          }
-        }
-      }
-      function loadModalData(selectedId){
-        //This function dinamically loads from the jinja embeded data some divs that make the form preview look awesome, pretty much the predefine data
-
-        // the small boxes on the screen
-        var target = document.getElementById(selectedId);
-        // the data thats embeded from jinja2
-          
-        try{
-          var unparsed = target.getAttribute("data-user");        
-          if (unparsed != ''){
-            var data = JSON.parse(unparsed.replaceAll("'",'"'));             
-            for (var key in data){
-                var attrName = key;
-                var attrValue = data[key];
-                target.innerHTML += '<div class="modal_data_container"><span class="modal_data_span">'+attrName+'</span>'+'<input value="'+attrValue+'" class="modal_data" readonly></div>';
-
-            }          
-          } 
-        }catch(err){
-          console.log(err)
-        }
-
-      }
-      function loadResultData(selectedId){
-        //this function should make even prettier the given detections
-
-        // the small boxes on the screen
-        var target = document.getElementById(selectedId);
-        // the data thats embeded from jinja2
-        var data = document.getElementById(selectedId).getAttribute("data-user").replaceAll("'",'"'); 
-
-        // this is the list of parsed from the embed
-        var detect_list = data.matchAll(/\[(.*?)\]/g);        
-        var detections = [];
-        for (const element of detect_list) {
-          detections.push(element[1]);
-        }// console.log(detections)
-        if (detections.length > 0){  
-          for (var i = detections.length - 1; i >= 0; i--) {
-            var number = detections[i].slice(0,2);
-            console.log(number);
-          }
-        }
-      }
-
-      
-      var panel = document.getElementById("panel").children;
-      for (var i = panel.length - 1; i >= 0; i--) {
-        // Iterates over every post in the panel
-        var selected = panel[i];
-        var selectedId =  selected.getAttribute("id");
-        loadHeatDetections("countbox:"+selectedId);         
-        loadModalData("contents"+selectedId);
-        // loadResultData("results"+selectedId);
-      }
-      // for each element in the detection box, if there is one creates the colored percentage in the quickview and the modal
-    }
     new ClipboardJS('.btn');
     ClientRender();
   </script>

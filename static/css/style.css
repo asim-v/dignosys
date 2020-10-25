@@ -61,7 +61,18 @@ hr.botm-line {
 /***************************************
 banner
 ***************************************/
-
+.status{
+    background-color: #d3d3d385;
+    width: fit-content;
+    padding: 2px;
+    border-radius: 5px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.Filled{
+    background-color: #f6ffe5;
+    color: #9bd52e;
+}
 .count{
     display: inline-flex;
     color: gray
