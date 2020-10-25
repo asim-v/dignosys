@@ -1,0 +1,23 @@
+{
+  "name": "Ensemble-Learning-using-Flask-master",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asim-v/dignosys.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asim-v/dignosys/issues"
+  },
+  "homepage": "https://github.com/asim-v/dignosys#readme",
+  "devDependencies": {
+    "firebase-tools": "^8.13.1"
+  }
+}
