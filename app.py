@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, request, jsonify, session, url_for, redirect
+from flask import Flask, flash, render_template, request, jsonify, session, url_for, redirect, send_from_directory
 from bson.objectid import ObjectId
 import pymongo
 import math
@@ -134,10 +134,6 @@ mongo = pymongo.MongoClient() # creates a connection to MongoDB by default no pa
 
 
 
-@app.route('/') #defines a root route
-def hello_world(): # method to handle at the root route
-    return render_template('index.html') #if the server responds (200) status code the it returns the html page to user pyt
-
 @app.route('/db/<id>',methods=['POST','DELETE','GET'])  
 def db(id):    
 
@@ -186,12 +182,22 @@ def db(id):
 
 
 
+@app.route('/') #defines a root route
+def hello_world(): # method to handle at the root route
+    return render_template('landing.html') #if the server responds (200) status code the it returns the html page to user pyt
+@app.route('/wp-content/<path:path>')
+def send_content(path):
+    return send_from_directory('wp-content', path)
+@app.route('/wp-includes/<path:path>')
+def send_includes(path):
+    return send_from_directory('wp-includes', path)
+
 
 @app.route('/signup', methods=['GET','POST']) #create a /signup route which    
 def signup():
     db = mongo.heart.users
     if request.method == 'GET':
-        return render_template("index.html")
+        return render_template("register.html")
     else:
         data = [ request.form['user_email'], request.form['user_password'], request.form['re_password'] ]  
         user_obj = {
@@ -385,7 +391,7 @@ def dashboard():
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'GET':
-        return render_template("index.html")
+        return render_template("login.html")
     else:
         db = mongo.heart.users 
         data = [ request.form['user_email'], request.form['user_password'] ] 
@@ -435,7 +441,7 @@ def contact():
 def logout():
     session.pop('id', None)
     isLoggedin = False
-    return render_template('index.html', isLoggedin=isLoggedin)
+    return render_template('landing.html', isLoggedin=isLoggedin)
 
 
 def process_user_data(data):
