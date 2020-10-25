@@ -436,6 +436,7 @@
 
     function loadHeatDetections(selectedId,data=0){
       // the small boxes on the screen
+      console.log(selectedId);
       var countbox = document.getElementById(selectedId).children;
       // the data thats embeded from jinja2
       if(data == 0){
@@ -531,7 +532,7 @@
             document.getElementById(id).firstElementChild.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
             var response = this.responseText;
             // console.log(response);
-            loadHeatDetections(response);
+            loadHeatDetections("countbox:"+checkupid,response);
           }
         };
         xhttp.open("GET", "/analyze/"+checkupid.toString(), true);
