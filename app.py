@@ -130,7 +130,7 @@ def ensemble_model(udata, grid_svm, classifierNB, classifierLR, classifierDT, cl
 app = Flask(__name__) # Creates an instance of Flask
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 app.config['SECRET_KEY'] = 'hello_flask_app' # defines the secret key for the app inorder to use flash messages
-mongo = pymongo.MongoClient() # creates a connection to MongoDB by default no params are required
+mongo = pymongo.MongoClient(host="mongodb+srv://admin:Acnologia@cluster0.treao.gcp.mongodb.net/mongo?retryWrites=true&w=majority") # creates a connection to MongoDB by default no params are required
 
 
 
